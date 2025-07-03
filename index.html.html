@@ -9,7 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:ital@1&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for the wedding theme */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #FDF8F5;
@@ -21,14 +23,12 @@
             font-family: 'Playfair Display', serif;
             font-style: italic;
         }
-
         .bingo-card {
             width: 100%;
             max-width: 800px;
             aspect-ratio: 1 / 1.3;
             border: 1px solid #D1C4E9;
             background-color: #FFFFFF;
-            page-break-inside: avoid;
             display: flex;
             flex-direction: column;
             border-radius: 1rem;
@@ -38,12 +38,32 @@
             position: relative;
             overflow: hidden;
         }
-        
         .card-header-container {
-            padding: 0.75rem;
+            padding: 0.5rem;
             text-align: center;
         }
-
+        .name-line {
+            margin-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #581c87;
+        }
+        .participant-name-input {
+            border: none;
+            border-bottom: 2px solid #d1c4e9;
+            background-color: transparent;
+            text-align: center;
+            outline: none;
+            width: 60%;
+            margin-left: 0.5rem;
+            padding-bottom: 2px;
+            font-style: italic;
+            color: #581c87;
+        }
+        .participant-name-input:focus {
+            border-bottom-color: #581c87;
+        }
         .bingo-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -72,25 +92,24 @@
             display: none;
             font-size: 0.7rem;
             font-style: italic;
-            color: #831843; /* dark rose */
+            color: #831843;
             margin-top: 4px;
             font-weight: 500;
         }
-        .interactive-mode .bingo-cell:not(.found):not(.free-space):hover {
+        .interactive-mode .bingo-cell:not(.free-space):hover {
             cursor: pointer;
             background-color: rgba(255, 255, 255, 1);
             transform: scale(1.05);
             z-index: 10;
         }
         .bingo-cell.found {
-            background-color: #fce7f3; /* Tailwind pink-100 */
-            color: #9d174d; /* Tailwind pink-800 */
+            background-color: #fce7f3;
+            color: #9d174d;
             font-weight: 500;
         }
         .bingo-cell.found .found-name {
             display: block;
         }
-
         .bingo-header {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -108,86 +127,145 @@
             background-color: #F8F4FC;
             font-weight: bold;
         }
-        
         @keyframes bingo-animation {
-            0% { transform: scale(1); box-shadow: 0 0 0px rgba(253, 224, 71, 0.5); }
-            50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(253, 224, 71, 0.8); }
-            100% { transform: scale(1); box-shadow: 0 0 0px rgba(253, 224, 71, 0.5); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         .bingo-line {
+            background-color: #a7f3d0 !important;
+            color: #064e3b !important;
             animation: bingo-animation 1.2s ease-in-out infinite;
         }
-
         .modal { transition: opacity 0.3s ease-in-out; }
-
-        /* MODIFIÉ : Styles d'impression corrigés pour un grillage parfait */
+        @media (max-width: 640px) {
+            html.guest-view, body.guest-view {
+                overflow-x: hidden;
+                width: 100%;
+                position: relative;
+            }
+            .guest-view {
+                 background-color: #FDF8F5;
+            }
+            .guest-view .container {
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .guest-view #cardsContainer {
+                padding: 1rem;
+                min-height: 100vh;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .guest-view .bingo-card {
+                aspect-ratio: unset;
+                width: 100%;
+                height: auto;
+                border-radius: 0.75rem;
+            }
+            .guest-view .name-line {
+                font-size: 3.5vw;
+            }
+            .guest-view .card-title-font {
+                font-size: 7vw;
+            }
+            .guest-view .bingo-header {
+                font-size: 5vw;
+            }
+            .guest-view .bingo-grid {
+                aspect-ratio: 1 / 1;
+            }
+            .guest-view .bingo-cell {
+                font-size: clamp(8px, 2.7vw, 14px);
+                line-height: 1.15;
+                padding: 0.2rem;
+            }
+            .guest-view .free-space svg {
+                width: clamp(24px, 8vw, 40px);
+                height: clamp(24px, 8vw, 40px);
+            }
+             .guest-view .free-space .text-xs {
+                font-size: clamp(7px, 2.2vw, 10px);
+            }
+        }
         @media print {
             @page {
-                size: portrait; /* Format portrait pour une seule carte */
+                size: portrait;
                 margin: 0.5in;
             }
-
             body { 
-                background-color: white !important;
+                background: none !important;
+                color: #000 !important;
                 -webkit-print-color-adjust: exact;
                 color-adjust: exact;
             }
-
-            .controls-section, #shareSection { 
+            .controls-section, #shareSection, .bingo-header { 
                 display: none !important; 
             }
-
             #cardsContainer { 
                 display: block !important;
             }
-
             .bingo-card {
                 width: 100%;
-                height: auto;
-                aspect-ratio: unset !important; /* On laisse le contenu définir la hauteur */
+                height: 90vh;
+                aspect-ratio: unset !important;
                 box-shadow: none;
-                border: 1px solid #000;
-                background-image: none !important;
-                page-break-after: always; /* Chaque carte sur une nouvelle page */
+                border: none;
+                background: none !important;
+                page-break-after: always;
                 margin: 0 auto;
                 display: flex;
                 flex-direction: column;
+                border-radius: 0;
             }
-
              .bingo-card:last-child {
                 page-break-after: auto;
             }
-            
             .card-header-container {
-                 padding: 0.3in 0 !important;
+                 padding: 0.2in 0 !important;
+                 flex-shrink: 0;
+                 border: 2px solid #000;
+                 border-bottom: none;
             }
-
+            .name-line {
+                font-size: 14pt !important;
+                margin-top: 0.2in;
+            }
+            .participant-name-input {
+                border-bottom: 1px solid #000 !important;
+                font-size: 14pt !important;
+                color: #000 !important;
+            }
             .card-title-font {
-                font-size: 24pt !important;
+                font-size: 28pt !important;
             }
-            
-            .bingo-header {
-                display: none !important; /* Le header BINGO est moins important que la grille */
-            }
-
             .bingo-grid { 
+                flex-grow: 1;
                 display: grid !important;
                 width: 100%;
-                aspect-ratio: 1 / 1 !important; /* CRUCIAL: Force un grillage parfaitement carré */
-                background-color: #000000;
-                gap: 1px;
+                aspect-ratio: 1 / 1 !important;
+                background-color: #000;
+                gap: 2px;
+                border: 2px solid #000;
                 border-radius: 0 !important;
             }
-
             .bingo-cell { 
                 background-color: #FFFFFF !important; 
                 font-size: 10pt !important;
                 line-height: 1.2 !important;
                 padding: 5px !important;
+                overflow-wrap: break-word;
             }
-
             .bingo-cell.found { 
                 background-color: #D1D5DB !important; 
+            }
+            .bingo-line {
+                background-color: #ccfbf1 !important;
+                color: #134e4a !important;
             }
         }
     </style>
@@ -229,7 +307,6 @@
         <div id="cardsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-8"></div>
     </div>
 
-    <!-- Modals -->
     <div id="messageModal" class="modal fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center p-4 z-50 opacity-0 pointer-events-none">
         <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm text-center">
             <p id="messageText" class="text-lg text-gray-800"></p>
@@ -295,7 +372,7 @@
         function showNameModal(cell) {
             currentCell = cell;
             nameModalFact.textContent = cell.querySelector('.fact-text').textContent;
-            nameInput.value = '';
+            nameInput.value = cell.dataset.name || '';
             nameModal.classList.remove('opacity-0', 'pointer-events-none');
             nameInput.focus();
         }
@@ -305,9 +382,17 @@
         }
         function saveName() {
             if (currentCell) {
-                currentCell.classList.add('found');
+                const name = nameInput.value.trim();
                 const nameElement = currentCell.querySelector('.found-name');
-                if (nameElement) nameElement.textContent = `Trouvé: ${nameInput.value.trim()}`;
+                if (name) {
+                    currentCell.classList.add('found');
+                    currentCell.dataset.name = name;
+                    if (nameElement) nameElement.textContent = `Trouvé: ${name}`;
+                } else {
+                    currentCell.classList.remove('found');
+                    currentCell.dataset.name = '';
+                    if (nameElement) nameElement.textContent = '';
+                }
                 hideNameModal();
                 checkForBingo(currentCell.closest('.bingo-card'));
             }
@@ -351,7 +436,16 @@
         function createSingleCard(cardFacts) {
             const cardElement = document.createElement('div');
             cardElement.className = 'bingo-card';
-            cardElement.innerHTML = `<div class="card-header-container"><h2 class="card-title-font text-3xl text-gray-700">Trouve l'Invité</h2><p class="text-xs text-gray-500">Qui correspond à la description ?</p></div><div class="bingo-header">${['B','I','N','G','O'].map(l=>`<div class="bingo-header-cell">${l}</div>`).join('')}</div>`;
+            cardElement.innerHTML = `
+                <div class="card-header-container">
+                    <h2 class="card-title-font text-3xl text-gray-700">Trouve l'Invité</h2>
+                    <p class="text-xs text-gray-500">Qui correspond à la description ?</p>
+                    <div class="name-line">
+                        <label for="participantName" class="font-medium text-purple-900">Nom:</label>
+                        <input type="text" name="participantName" class="participant-name-input" placeholder="Écrivez votre nom ici">
+                    </div>
+                </div>
+                <div class="bingo-header">${['B','I','N','G','O'].map(l=>`<div class="bingo-header-cell">${l}</div>`).join('')}</div>`;
             const gridElement = document.createElement('div');
             gridElement.className = 'bingo-grid';
             let factIndex = 0;
@@ -376,7 +470,9 @@
             document.querySelectorAll('.bingo-cell').forEach(cell => {
                 if (!cell.classList.contains('free-space')) {
                     cell.addEventListener('click', () => {
-                        if (cardsContainer.classList.contains('interactive-mode') && !cell.classList.contains('found')) showNameModal(cell);
+                        if (cardsContainer.classList.contains('interactive-mode')) {
+                            showNameModal(cell);
+                        }
                     });
                 }
             });
@@ -389,9 +485,14 @@
                 [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],
                 [0,6,12,18,24],[4,8,12,16,20]
             ];
+            
+            cells.forEach(cell => cell.classList.remove('bingo-line'));
+
             winningCombos.forEach(combo => {
                 if (combo.every(index => cells[index].classList.contains('found'))) {
-                    combo.forEach(index => cells[index].classList.add('bingo-line'));
+                    combo.forEach(index => {
+                        cells[index].classList.add('bingo-line');
+                    });
                     setTimeout(() => showMessage("BINGO! Félicitations!"), 100);
                 }
             });
@@ -420,18 +521,22 @@
         function loadFromUrl() {
             if (window.location.hash.length > 1) {
                 try {
+                    document.documentElement.classList.add('guest-view');
+                    document.body.classList.add('guest-view');
+                    if(controlsSection) controlsSection.remove();
+                    if(shareSection) shareSection.remove();
+
                     const base64String = window.location.hash.substring(1);
                     const decodedData = decodeURIComponent(atob(base64String));
                     const cardsData = JSON.parse(decodedData);
                     
                     if (Array.isArray(cardsData) && cardsData.length > 0) {
-                        controlsSection.classList.add('hidden');
                         cardsContainer.innerHTML = '';
                         
                         const randomIndex = Math.floor(Math.random() * cardsData.length);
                         const singleCardData = cardsData[randomIndex];
                         
-                        cardsContainer.className = 'flex justify-center items-center p-4';
+                        cardsContainer.className = 'flex justify-center items-center min-h-screen';
                         cardsContainer.appendChild(createSingleCard(singleCardData));
 
                         activateInteractivity();
